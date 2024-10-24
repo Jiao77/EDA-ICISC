@@ -1,0 +1,3 @@
+https://www.bilibili.com/video/BV1sz4y1x7v1/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=8b75e029f1926b6b7f467ed5a028f0b0
+里面有KD的结构介绍以及最近搜索算法介绍，除此之外还给出了详细的KD树构造和搜索算法的源码。
+视频作者还给出了KD树的其他作用，比如范围搜索（范围搜索：找出所有给定区域内的所有点）。
