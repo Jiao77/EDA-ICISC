@@ -1180,6 +1180,63 @@ class FuzzyMatching : baseOps {
 class PreciseMatching : baseOps{
     public:
 
+    KdTree* findPointInTree (KdTree* tree, pointInTree point, int depth) {
+        if (tree->isEmpty()) {
+            cout << "Tree is empty in finding point in tree" << endl;
+            return nullptr; 
+        }
+
+        if (tree->root.x == point.x && tree->root.y == point.y) return tree;
+
+        if (tree->isLeaf()) {
+            cout << "point not find in tree" << endl;
+            return nullptr; 
+        }
+
+        switch (depth % 2) {
+            case 0: {
+                if (point.x < tree->root.x) {
+                    tree = tree->leftChild;
+                } else {
+                    tree = tree->rightChild;
+                }
+                break;
+            }
+            case 1: {
+                if (point.y < tree->root.y) {
+                    tree = tree->leftChild;
+                } else {
+                    tree = tree->rightChild;
+                }
+                break;
+            }
+            default: break;
+        }
+
+        return findPointInTree (tree, point, depth+1);
+    }
+
+    bool checkCornerInPotentialArea (pointInTree point, potentialMatchingArea area) {
+        return point.x >= area.left && point.x <= area.right && point.y >= area.down && point.y <= area.up;
+    }
+
+    void inOrderTracerse (KdTree* tree ) {
+        if (tree->isEmpty()) {
+            return;
+        }
+    }
+
+    vector <int> findManhattenInPotentialArea (layer layerInLayout, potentialMatchingArea area, Pattern pattern) {
+        vector <int> index;
+        if (area.matchLayer[layerInLayout.layerNum] != true) {
+            return index;
+        }
+
+        if (pattern.layers[layerInLayout.layerNum - 1].marked == false) {
+            return index;
+        }
+    }
+
     vector<Manhatten> cutByMarker (Manhatten ManHT, marker mark) {
         Point currentPoint = {ManHT.x, ManHT.y};
         Point nextPoint = currentPoint;
@@ -1835,7 +1892,7 @@ class test {
         clock_t start_t, finish_t;
         baseOps BO;
         start_t = clock();
-        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
+        auto pattern = r.readPattern("./testset/large/largepattern.txt");
         finish_t = clock();
         cout << "Reading large pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
         start_t = clock();
@@ -1927,7 +1984,7 @@ class test {
 
     int testKdTree () {
         Read r;
-        auto pattern = r.readPattern("./testset/large/large_layout.txt");
+        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
         for (auto pat : pattern.patterns) {
             int i = 0;
             int j = 0;
@@ -1941,6 +1998,19 @@ class test {
             j = 0;
             cout << endl;
         }
+        return 0;
+    }
+
+    int testFindPointInTree () {
+        Read r;
+        PreciseMatching PM;
+        auto patternMap = r.readPattern("./testset/small/small_pattern.txt");
+        auto layer = patternMap.patterns[0].layers[0];
+        pointInTree point;
+        point.x = 4800;
+        point.y = 12000;
+        KdTree* findedTree = PM.findPointInTree(&layer.tree1, point, 0);
+        printKdTree(findedTree, 0);
         return 0;
     }
 };
@@ -1958,7 +2028,8 @@ int main () {
     // t.testReadLayout();
     // t.testFindPotentialArea();
     // t.testmMirrorManhatten();
-    t.testKdTree();
+    // t.testKdTree();
+    t.testFindPointInTree();
     finish_t = clock();
     cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
     return 0;

@@ -1,0 +1,26 @@
+Reading large pattern use 0 s
+Reading large layout use 36.36 s
+Unmirrored:
+Num1 pattern have 144134 potential areas
+Finding potential areas in Num1 pattern use 129.32 s
+There are 144134 areas whose match num is 1
+Num2 pattern have 257331 potential areas
+Finding potential areas in Num2 pattern use 399.25 s
+There are 257221 areas whose match num is 1
+There are 110 areas whose match num is 2
+Num3 pattern have 15742 potential areas
+Finding potential areas in Num3 pattern use 6.23 s
+There are 15742 areas whose match num is 1
+Mirrored:
+Num1 pattern have 146694 potential areas
+Finding potential areas in Num1 pattern use 133.6 s
+There are 146694 areas whose match num is 1
+Num2 pattern have 231710 potential areas
+Finding potential areas in Num2 pattern use 445.49 s
+There are 205979 areas whose match num is 1
+There are 25731 areas whose match num is 2
+Num3 pattern have 15213 potential areas
+Finding potential areas in Num3 pattern use 6.29 s
+There are 14684 areas whose match num is 1
+There are 529 areas whose match num is 2
+Time: 1157.12
