@@ -1313,15 +1313,14 @@ class PreciseMatching : baseOps{
     }
 
     int areaFilterByManhattenNum (layout layout, patternMatchResult& areas, Pattern pattern) {
-        int i = 0;
-        for (auto area : areas.potentialMatchingAreas) {
+        for (int i = 0; i < areas.potentialMatchingAreas.size(); i++) {
+            auto area = areas.potentialMatchingAreas[i];
             for (auto layerInLayout : layout.layers) {
                 areaCheckerByManhattenNum(layerInLayout, area, pattern);
             }
             if (area.matchNum <= 0) {
                 areas.potentialMatchingAreas.erase(areas.potentialMatchingAreas.begin() + i);
             }
-            i++;
         }
         return 0;
     }
@@ -1982,11 +1981,11 @@ class test {
         clock_t start_t, finish_t;
         baseOps BO;
         start_t = clock();
-        auto pattern = r.readPattern("./testset/large/large_pattern.txt");
+        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
         finish_t = clock();
         cout << "Reading large pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
         start_t = clock();
-        auto layout = r.readLayout("./testset/large/large_layout.txt");
+        auto layout = r.readLayout("./testset/small/small_layout.txt");
         finish_t = clock();
         cout << "Reading large layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
         cout << "Unmirrored:" << endl;
@@ -2138,7 +2137,9 @@ class test {
         baseOps BO;
 
         auto patternMap = r.readPattern("./testset/small/small_pattern.txt");
+        auto layout = r.readLayout("./testset/large/large_layout.txt");
         auto layer = patternMap.patterns[0].layers[0];
+        layer = layout.layers[0];
         potentialMatchingArea area;
         area.down = 0;
         area.left = 1000;
