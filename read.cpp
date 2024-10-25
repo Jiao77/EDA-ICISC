@@ -99,7 +99,7 @@ struct KdTree {
         return root.x == -1 && root.y == -1;
     }
     bool isLeaf()  {
-        return (!isEmpty()) && leftChild == NULL && rightChild == NULL;
+        return leftChild == NULL && rightChild == NULL;
     }
     bool isRoot()  {
         return (!isEmpty()) && parent == NULL;
@@ -139,6 +139,11 @@ struct patternMap {
     vector<Pattern> patterns;
 };
 
+struct matchInfo {
+    vector<pointInTree> corners;
+    map<int, int> ManhattenInArea;
+};
+
 struct potentialMatchingArea {
     int up;
     int down;
@@ -150,8 +155,8 @@ struct potentialMatchingArea {
     map <int, bool> matchLayer;
     int matchNum = 0;
 
-    vector<pointInTree> corners;
-    map<int, int> ManhattenInArea;
+    map<int, matchInfo> layerMatchInfo;
+
 };
 
 struct patternMatchResult {
@@ -1203,8 +1208,14 @@ class PreciseMatching : baseOps{
         return point.x >= area.left && point.x <= area.right && point.y >= area.down && point.y <= area.up;
     }
 
-    void KdTreeAreaSearch (KdTree* tree, potentialMatchingArea area, int depth, vector<pointInTree> result) {
-        if (tree->isEmpty()) return ;
+    void KdTreeAreaSearch (KdTree* tree, potentialMatchingArea area, int depth, vector<pointInTree> &result) {
+        if (tree == nullptr) return ;
+        if (tree->isLeaf()) {
+            if (checkCornerInPotentialArea (tree->root, area)) {
+                result.push_back(tree->root);
+            }
+            return;
+        }
         int dimension = depth % 2;
         int flag;
         switch (dimension) {
@@ -1259,20 +1270,60 @@ class PreciseMatching : baseOps{
         }
     }
 
-    void addManhattensToPotentialArea (layer layer, potentialMatchingArea area) {
-        if (area.matchLayer[layer.layerNum] != true) {
-            return ;
-        }
+    void addManhattensToPotentialArea (layer layer, potentialMatchingArea& area) {
 
         if (layer.Manhattens.size() == 0) {
             return ;
         }
 
-        KdTreeAreaSearch(&layer.tree1, area, layer.tree1.dimension, area.corners);
+        KdTreeAreaSearch(&layer.tree1, area, layer.tree1.dimension, area.layerMatchInfo[layer.layerNum].corners);
 
-        for (auto points : area.corners) {
-            area.ManhattenInArea[points.index] ++;
+        for (auto points : area.layerMatchInfo[layer.layerNum].corners) {
+            area.layerMatchInfo[layer.layerNum].ManhattenInArea[points.index] ++;
         }
+    }
+
+    int areaCheckerByManhattenNum (layer layerInLayout, potentialMatchingArea& area, Pattern pattern) {
+        if (area.matchLayer[layerInLayout.layerNum] != true) {
+            return 0;
+        }
+
+        layer layerInPattern;
+        layerInPattern.layerNum = -1;
+        for (int i = 0; i < pattern.layers.size(); i++) {
+            if (pattern.layers[i].layerNum == layerInLayout.layerNum) {
+                layerInPattern = pattern.layers[i];
+                break;
+            }
+        }
+
+        if (layerInPattern.layerNum == -1) {
+            cout << "This pattern don`t have layer num match to this layer in filter potential area." << endl;
+            return -1;
+        }
+
+        addManhattensToPotentialArea(layerInLayout, area);
+
+        if (area.layerMatchInfo[layerInLayout.layerNum].ManhattenInArea.size() != layerInPattern.Manhattens.size()) {
+            area.matchLayer[layerInLayout.layerNum] = false;
+            area.matchNum --;
+        }
+
+        return 0;
+    }
+
+    int areaFilterByManhattenNum (layout layout, patternMatchResult& areas, Pattern pattern) {
+        int i = 0;
+        for (auto area : areas.potentialMatchingAreas) {
+            for (auto layerInLayout : layout.layers) {
+                areaCheckerByManhattenNum(layerInLayout, area, pattern);
+            }
+            if (area.matchNum <= 0) {
+                areas.potentialMatchingAreas.erase(areas.potentialMatchingAreas.begin() + i);
+            }
+            i++;
+        }
+        return 0;
     }
 
     vector<Manhatten> cutByMarker (Manhatten ManHT, marker mark) {
@@ -1927,10 +1978,11 @@ class test {
     int testFindPotentialArea () {
         Read r;
         FuzzyMatching FM;
+        PreciseMatching PM;
         clock_t start_t, finish_t;
         baseOps BO;
         start_t = clock();
-        auto pattern = r.readPattern("./testset/large/largepattern.txt");
+        auto pattern = r.readPattern("./testset/large/large_pattern.txt");
         finish_t = clock();
         cout << "Reading large pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
         start_t = clock();
@@ -1951,6 +2003,20 @@ class test {
             for (auto pair : Mnum) {
                 cout << "There are " << pair.second << " areas whose match num is " << pair.first << endl;
             }
+
+            start_t = clock();
+            PM.areaFilterByManhattenNum(layout, potentialArea, pattern.patterns[i]);
+            cout << "Num" << i+1 << " pattern have " << potentialArea.potentialMatchingAreas.size() << " potential areas after filter by Manhatten num" << endl;
+            finish_t = clock();
+            cout << "Filtering potential areas in Num" << i+1 << " pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+            map<int, int> Mnum1;
+            for (auto area : potentialArea.potentialMatchingAreas) {
+                Mnum1[area.matchLayer.size()] ++;
+            }
+            for (auto pair : Mnum1) {
+                cout << "There are " << pair.second << " areas whose match num is " << pair.first << endl;
+            }
+
         }
         auto mirrorMap = BO.mirrorPatternMap(pattern);
         cout << "Mirrored:" << endl;
@@ -1965,6 +2031,19 @@ class test {
                 Mnum[area.matchLayer.size()] ++;
             }
             for (auto pair : Mnum) {
+                cout << "There are " << pair.second << " areas whose match num is " << pair.first << endl;
+            }
+
+            start_t = clock();
+            PM.areaFilterByManhattenNum(layout, potentialArea, pattern.patterns[i]);
+            cout << "Num" << i+1 << " pattern have " << potentialArea.potentialMatchingAreas.size() << " potential areas after filter by Manhatten num" << endl;
+            finish_t = clock();
+            cout << "Filtering potential areas in Num" << i+1 << " pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+            map<int, int> Mnum1;
+            for (auto area : potentialArea.potentialMatchingAreas) {
+                Mnum1[area.matchLayer.size()] ++;
+            }
+            for (auto pair : Mnum1) {
                 cout << "There are " << pair.second << " areas whose match num is " << pair.first << endl;
             }
         }
@@ -2068,13 +2147,13 @@ class test {
 
         PM.addManhattensToPotentialArea(layer, area);
 
-        for (auto point : area.corners) {
+        for (auto point : area.layerMatchInfo[1].corners) {
             cout << "(" << point.x << "," << point.y << ") , " ;
         }
 
         cout << endl;
 
-        for (auto pair : area.ManhattenInArea) {
+        for (auto pair : area.layerMatchInfo[1].ManhattenInArea) {
             cout << "Manhatten " << pair.first << " have " << pair.second << "corners in area" << endl;
         }
 
@@ -2093,10 +2172,10 @@ int main () {
     // t.testFixManhatten();
     // t.testManhattenMatch();
     // t.testReadLayout();
-    // t.testFindPotentialArea();
+    t.testFindPotentialArea();
     // t.testmMirrorManhatten();
     // t.testKdTree();
-    t.testFindPointInTree();
+    // t.testFindPointInTree();
     // t.testAddManhattenToPotentialArea();
     finish_t = clock();
     cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
