@@ -92,8 +92,9 @@ struct KdTree {
     KdTree* parent;
     KdTree* leftChild;
     KdTree* rightChild;
+    int dimension;
 
-    KdTree() : parent(NULL), leftChild(NULL), rightChild(NULL) {}
+    KdTree() : parent(NULL), leftChild(NULL), rightChild(NULL), dimension(-1) {}
     bool isEmpty()  {
         return root.x == -1 && root.y == -1;
     }
@@ -477,30 +478,6 @@ class baseOps {
         return newData;
     }
 
-    // bool pointCmpX (pointInTree p1, pointInTree p2) {
-    //     return p1.x < p2.x;
-    // }
-
-    // bool pointCmpY (pointInTree p1, pointInTree p2) {
-    //     return p1.y < p2.y;
-    // }
-
-    // void sortPointsInTree (vector<pointInTree> data, int mod) {
-    //     switch (mod) {
-    //         case 0: {
-    //             sort(data.begin(), data.end(), pointCmpX);
-    //             break;
-    //         }
-
-    //         case 1: {
-    //             sort(data.begin(), data.end(), pointCmpY);
-    //             break;
-    //         }
-
-    //         default: break;
-    //     }
-    // }
-
     int findMiddlePoint (vector<pointInTree> data, int mod) {
         map<int, int> xMap;
         for (auto point : data) {
@@ -524,6 +501,7 @@ class baseOps {
             return ;
         } else if (num == 1) {
             tree -> root = data[0];
+            tree -> dimension = 0;
             return ;
         }
         vector<pointInTree> transData = Transpose(data);
@@ -538,6 +516,7 @@ class baseOps {
                 for (int i = 0; i < num; i++) {
                     if (data[i].x == splitPoint && tree->isEmpty()) {
                         tree -> root = data[i];
+                        tree -> dimension = 0;
                     } else {
                         if (data[i].x < splitPoint) {
                             subset1.push_back(data[i]);
@@ -553,6 +532,7 @@ class baseOps {
                 for (int i = 0; i < num; i++) {
                     if (data[i].y == splitPoint && tree->isEmpty()) {
                         tree -> root = data[i];
+                        tree -> dimension = 0;
                     } else {
                         if (data[i].y < splitPoint) {
                             subset1.push_back(data[i]);
@@ -1220,9 +1200,59 @@ class PreciseMatching : baseOps{
         return point.x >= area.left && point.x <= area.right && point.y >= area.down && point.y <= area.up;
     }
 
-    void inOrderTracerse (KdTree* tree ) {
-        if (tree->isEmpty()) {
-            return;
+    void KdTreeAreaSearch (KdTree* tree, potentialMatchingArea area, int depth, vector<pointInTree> result) {
+        if (tree->isEmpty()) return ;
+        int dimension = depth % 2;
+        int flag;
+        switch (dimension) {
+            case 0: {
+                if (tree -> root.x > area.right) {
+                    flag = -1;
+                } else if (tree -> root.x < area.left) {
+                    flag = 1;
+                } else flag = 0;
+                break;
+            }
+            case 1: {
+                if (tree -> root.y > area.up) {
+                    flag = -1;
+                } else if (tree -> root.y < area.down) {
+                    flag = 1;
+                } else flag = 0;
+                break;
+            }
+            default: break;
+        }
+        if (flag < 0) {
+            KdTreeAreaSearch(tree -> leftChild, area, depth+1, result);
+        } else if (flag > 0) {
+            KdTreeAreaSearch(tree -> rightChild, area, depth+1, result);
+        } else {
+            potentialMatchingArea leftArea, rightArea;
+            switch (dimension) {
+                case 0: {
+                    leftArea.up = rightArea.up = area.up;
+                    leftArea.down = rightArea.down = area.down;
+                    leftArea.right = rightArea.left = tree -> root.x;
+                    leftArea.left = area.left;
+                    rightArea.right = area.right;
+                    break;
+                }
+                case 1: {
+                    leftArea.left = rightArea.left = area.left;
+                    leftArea.right = rightArea.right = area.right;
+                    leftArea.up = rightArea.down = tree -> root.y;
+                    leftArea.down = area.down;
+                    rightArea.up = area.up;
+                    break;
+                }
+                default: break;
+            }
+            KdTreeAreaSearch(tree -> leftChild, leftArea, depth+1, result);
+            KdTreeAreaSearch(tree -> rightChild, rightArea, depth+1, result);
+            if (tree->root.x <= area.right && tree->root.x >= area.left && tree->root.y >= area.down && tree->root.y <= area.up) {
+                result.push_back(tree->root);
+            }
         }
     }
 
@@ -2028,8 +2058,8 @@ int main () {
     // t.testReadLayout();
     // t.testFindPotentialArea();
     // t.testmMirrorManhatten();
-    // t.testKdTree();
-    t.testFindPointInTree();
+    t.testKdTree();
+    // t.testFindPointInTree();
     finish_t = clock();
     cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
     return 0;
