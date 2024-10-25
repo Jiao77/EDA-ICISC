@@ -149,6 +149,9 @@ struct potentialMatchingArea {
 
     map <int, bool> matchLayer;
     int matchNum = 0;
+
+    vector<pointInTree> corners;
+    map<int, int> ManhattenInArea;
 };
 
 struct patternMatchResult {
@@ -1250,20 +1253,25 @@ class PreciseMatching : baseOps{
             }
             KdTreeAreaSearch(tree -> leftChild, leftArea, depth+1, result);
             KdTreeAreaSearch(tree -> rightChild, rightArea, depth+1, result);
-            if (tree->root.x <= area.right && tree->root.x >= area.left && tree->root.y >= area.down && tree->root.y <= area.up) {
+            if (checkCornerInPotentialArea(tree->root, area)) {
                 result.push_back(tree->root);
             }
         }
     }
 
-    vector <int> findManhattenInPotentialArea (layer layerInLayout, potentialMatchingArea area, Pattern pattern) {
-        vector <int> index;
-        if (area.matchLayer[layerInLayout.layerNum] != true) {
-            return index;
+    void addManhattensToPotentialArea (layer layer, potentialMatchingArea area) {
+        if (area.matchLayer[layer.layerNum] != true) {
+            return ;
         }
 
-        if (pattern.layers[layerInLayout.layerNum - 1].marked == false) {
-            return index;
+        if (layer.Manhattens.size() == 0) {
+            return ;
+        }
+
+        KdTreeAreaSearch(&layer.tree1, area, layer.tree1.dimension, area.corners);
+
+        for (auto points : area.corners) {
+            area.ManhattenInArea[points.index] ++;
         }
     }
 
@@ -2043,6 +2051,35 @@ class test {
         printKdTree(findedTree, 0);
         return 0;
     }
+
+    int testAddManhattenToPotentialArea () {
+        Read r;
+        PreciseMatching PM;
+        FuzzyMatching FM;
+        baseOps BO;
+
+        auto patternMap = r.readPattern("./testset/small/small_pattern.txt");
+        auto layer = patternMap.patterns[0].layers[0];
+        potentialMatchingArea area;
+        area.down = 0;
+        area.left = 1000;
+        area.up = 13800;
+        area.right = 10200;
+
+        PM.addManhattensToPotentialArea(layer, area);
+
+        for (auto point : area.corners) {
+            cout << "(" << point.x << "," << point.y << ") , " ;
+        }
+
+        cout << endl;
+
+        for (auto pair : area.ManhattenInArea) {
+            cout << "Manhatten " << pair.first << " have " << pair.second << "corners in area" << endl;
+        }
+
+        return 0;
+    }
 };
 
 int main () {
@@ -2058,8 +2095,9 @@ int main () {
     // t.testReadLayout();
     // t.testFindPotentialArea();
     // t.testmMirrorManhatten();
-    t.testKdTree();
-    // t.testFindPointInTree();
+    // t.testKdTree();
+    t.testFindPointInTree();
+    // t.testAddManhattenToPotentialArea();
     finish_t = clock();
     cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
     return 0;
