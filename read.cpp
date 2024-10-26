@@ -24,151 +24,171 @@ using namespace std;
         - hard to check the edge of marker.
 */
 
-struct Point {
-    int x = 0;
-    int y = 0;
-};
 
-struct Polygon {
-    vector<Point> points;
-};
-
-/*
-Data Storage type2:
-    storage the coordinate of the leftest point of the top line and the length and direction of edges
-
-    good points:
-        - all good points of type1.
-        - easy to search the rotated and mirrored type.
-        - easy to match when searching.
-
-    bad points:
-        - need to compute every relative distance when storaging.
-        - hard to check the edge of marker.
-*/
-
-/*
-Direction Description:
-0 as up
-1 as right
-2 as down
-3 as left
-*/
-
-struct edge {
-    int length;
-    int direction;
-};
-
-struct Manhatten {
-    //the leftest point of the top line
-    int x;
-    int y;
-
-    int up;
-    int down;
-    int left;
-    int right;
-
-    vector<edge> edges;
-    vector<Point> points; //the points of the polygon
-
-    map<int, int> mEdgeLength;
-    int incornerCount;
-    int outcornerCount;
-};
-
-struct pointInTree {
-    int x;
-    int y;
-    int location;
-    int index;
-
-    pointInTree() : x(-1), y(-1), location(0) {}
-};
-
-struct KdTree {
-    pointInTree root = pointInTree();
-    KdTree* parent;
-    KdTree* leftChild;
-    KdTree* rightChild;
-    int dimension;
-
-    KdTree() : parent(NULL), leftChild(NULL), rightChild(NULL), dimension(-1) {}
-    bool isEmpty()  {
-        return root.x == -1 && root.y == -1;
-    }
-    bool isLeaf()  {
-        return leftChild == NULL && rightChild == NULL;
-    }
-    bool isRoot()  {
-        return (!isEmpty()) && parent == NULL;
-    }
-    bool isLeft()  {
-        return parent != NULL && parent->leftChild == this;
-    }
-    bool isRight()  {
-        return parent != NULL && parent->rightChild == this;
-    }
-};
-
-struct layer {
-    vector<Manhatten> Manhattens;
-    bool marked;
-    Manhatten markManhatten;
-    int layerNum = 0; //the layer number
-    vector<pointInTree> pointsInTree;
-    KdTree tree1 = KdTree();
-    KdTree* tree = &tree1;
-};
-
-struct marker {
-    int up;
-    int down;
-    int left;
-    int right;
-};
-
-struct Pattern {
-    vector<layer> layers;
-    marker mark;
-    int patternNum = 0;
-};
-
-struct patternMap {
-    vector<Pattern> patterns;
-};
-
-struct matchInfo {
-    vector<pointInTree> corners;
-    map<int, int> ManhattenInArea;
-};
-
-struct potentialMatchingArea {
-    int up;
-    int down;
-    int left;
-    int right;
-
-    int rotationMod;
-
-    map <int, bool> matchLayer;
-    int matchNum = 0;
-
-    map<int, matchInfo> layerMatchInfo;
-
-};
-
-struct patternMatchResult {
-    vector<potentialMatchingArea> potentialMatchingAreas;
-};
-
-struct layout {
-    vector <layer> layers;
-};
 
 class baseOps {
     public:
+
+    struct Point {
+        int x = 0;
+        int y = 0;
+    };
+
+    struct Polygon {
+        vector<Point> points;
+    };
+
+    /*
+    Data Storage type2:
+        storage the coordinate of the leftest point of the top line and the length and direction of edges
+
+        good points:
+            - all good points of type1.
+            - easy to search the rotated and mirrored type.
+            - easy to match when searching.
+
+        bad points:
+            - need to compute every relative distance when storaging.
+            - hard to check the edge of marker.
+    */
+
+    /*
+    Direction Description:
+    0 as up
+    1 as right
+    2 as down
+    3 as left
+    */
+
+    struct edge {
+        int length;
+        int direction;
+    };
+
+    struct Manhatten {
+        //the leftest point of the top line
+        int x;
+        int y;
+
+        int up;
+        int down;
+        int left;
+        int right;
+
+        vector<edge> edges;
+        vector<Point> points; //the points of the polygon
+
+        map<int, int> mEdgeLength;
+        int incornerCount;
+        int outcornerCount;
+    };
+
+    struct pointInTree {
+        int x;
+        int y;
+        int location;
+        int index;
+
+        pointInTree() : x(-1), y(-1), location(0) {}
+    };
+
+    struct KdTree {
+        pointInTree root = pointInTree();
+        KdTree* parent;
+        KdTree* leftChild;
+        KdTree* rightChild;
+        int dimension;
+
+        KdTree() : parent(NULL), leftChild(NULL), rightChild(NULL), dimension(-1) {}
+        bool isEmpty()  {
+            return root.x == -1 && root.y == -1;
+        }
+        bool isLeaf()  {
+            return leftChild == NULL && rightChild == NULL;
+        }
+        bool isRoot()  {
+            return (!isEmpty()) && parent == NULL;
+        }
+        bool isLeft()  {
+            return parent != NULL && parent->leftChild == this;
+        }
+        bool isRight()  {
+            return parent != NULL && parent->rightChild == this;
+        }
+    };
+
+    struct layer {
+        vector<Manhatten> Manhattens;
+        bool marked;
+        Manhatten markManhatten;
+        vector<Manhatten> comManhattens;
+        int layerNum = 0; //the layer number
+        vector<pointInTree> pointsInTree;
+        KdTree tree1 = KdTree();
+        KdTree* tree = &tree1;
+    };
+
+    struct marker {
+        int up;
+        int down;
+        int left;
+        int right;
+    };
+
+    struct Pattern {
+        vector<layer> layers;
+        marker mark;
+        int patternNum = 0;
+    };
+
+    struct patternMap {
+        vector<Pattern> patterns;
+    };
+
+    struct matchInfo {
+        vector<pointInTree> corners;
+        map<int, int> ManhattenInArea;
+    };
+
+    struct potentialMatchingArea {
+        int up;
+        int down;
+        int left;
+        int right;
+
+        int rotationMod;
+        map<int, int> index;
+
+        map <int, bool> matchLayer;
+        int matchNum = 0;
+
+        map<int, matchInfo> layerMatchInfo;
+
+    };
+
+    struct patternMatchResult {
+        vector<potentialMatchingArea> potentialMatchingAreas;
+    };
+
+    struct layout {
+        vector <layer> layers;
+    };
+
+    struct greaterPoint {
+        bool operator() (pointInTree p1, pointInTree p2) {
+            if (p1.x < p2.x) {
+                return true;
+            } else if (p1.x == p2.x) {
+                if (p1.y < p2.y) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    };
 
     bool checkPointInMarker (Point p, marker mark) {
         if (p.x >= mark.left && p.x <= mark.right && p.y <= mark.up && p.y >= mark.down) {
@@ -627,6 +647,7 @@ class Read : baseOps {
                     marked = true;
                     state = 1;
                 }
+                inLayer.comManhattens.push_back(m);
             }
         }
 
@@ -784,6 +805,7 @@ class Read : baseOps {
                     nowLayer.Manhattens = currentLayer;
                     nowLayer.layerNum = layerNum;
                     nowLayer.pointsInTree = generatePOintsInTree(nowLayer);
+                    sort(nowLayer.pointsInTree.begin(), nowLayer.pointsInTree.end(), greaterPoint());
                     buildKdTree(nowLayer.tree, nowLayer.pointsInTree, 0);
                     currentPattern.push_back(nowLayer);
                     layerNum ++;
@@ -808,6 +830,7 @@ class Read : baseOps {
                     nowLayer.Manhattens = currentLayer;
                     nowLayer.layerNum = layerNum;
                     nowLayer.pointsInTree = generatePOintsInTree(nowLayer);
+                    sort(nowLayer.pointsInTree.begin(), nowLayer.pointsInTree.end(), greaterPoint());
                     buildKdTree(nowLayer.tree, nowLayer.pointsInTree, 0);
                     currentPattern.push_back(nowLayer);
                     layerNum ++;
@@ -849,6 +872,7 @@ class Read : baseOps {
             nowLayer.Manhattens = currentLayer;
             nowLayer.layerNum = layerNum;
             nowLayer.pointsInTree = generatePOintsInTree(nowLayer);
+            sort(nowLayer.pointsInTree.begin(), nowLayer.pointsInTree.end(), greaterPoint());
             buildKdTree(nowLayer.tree, nowLayer.pointsInTree, 0);
             currentPattern.push_back(nowLayer);
             layerNum ++;
@@ -904,6 +928,7 @@ class Read : baseOps {
                     nowLayer.Manhattens = currentLayer;
                     nowLayer.layerNum = layerNum;
                     nowLayer.pointsInTree = generatePOintsInTree(nowLayer);
+                    sort(nowLayer.pointsInTree.begin(), nowLayer.pointsInTree.end(), greaterPoint());
                     buildKdTree(nowLayer.tree, nowLayer.pointsInTree, 0);
                     currentLayout.push_back(nowLayer);
                     layerNum ++;
@@ -926,6 +951,7 @@ class Read : baseOps {
             nowLayer.Manhattens = currentLayer;
             nowLayer.layerNum = layerNum;
             nowLayer.pointsInTree = generatePOintsInTree(nowLayer);
+            sort(nowLayer.pointsInTree.begin(), nowLayer.pointsInTree.end(), greaterPoint());
             buildKdTree(nowLayer.tree, nowLayer.pointsInTree, 0);
             currentLayout.push_back(nowLayer);
             layerNum ++;
@@ -1059,9 +1085,12 @@ class FuzzyMatching : baseOps {
 
             if (!layerInPattern.marked) {
                 continue;
+            } else if (layerInPattern.markManhatten.edges.size() == 4) {
+                continue;
             }
 
             for (auto ManhattenInLayout : layerInLayout.Manhattens) {
+                int i = 0;
                 int matchMod = ManhattenMatch(ManhattenInLayout, layerInPattern.markManhatten);
                 switch (matchMod) {
                     case -1: {
@@ -1077,6 +1106,7 @@ class FuzzyMatching : baseOps {
                         Area1.right = ManhattenInLayout.right + layerInPattern.markManhatten.left - pattern.mark.left;
                         Area1.matchLayer[layerInPattern.layerNum] = true;
                         Area1.rotationMod = matchMod;
+                        Area1.index[layerInLayout.layerNum] = i;
 
                         if (potentialAreaMatch(Area1, result) >= result.potentialMatchingAreas.size()) {
                             Area1.matchNum  = 1;
@@ -1099,6 +1129,7 @@ class FuzzyMatching : baseOps {
                         Area1.right = ManhattenInLayout.right - layerInPattern.markManhatten.down + pattern.mark.down;
                         Area1.matchLayer[layerInPattern.layerNum] = true;
                         Area1.rotationMod = matchMod;
+                        Area1.index[layerInLayout.layerNum] = i;
 
                         if (potentialAreaMatch(Area1, result) >= result.potentialMatchingAreas.size()) {
                             Area1.matchNum  = 1;
@@ -1121,6 +1152,7 @@ class FuzzyMatching : baseOps {
                         Area1.right = ManhattenInLayout.right - layerInPattern.markManhatten.right + pattern.mark.right;
                         Area1.matchLayer[layerInPattern.layerNum] = true;
                         Area1.rotationMod = matchMod;
+                        Area1.index[layerInLayout.layerNum] = i;
 
                         if (potentialAreaMatch(Area1, result) >= result.potentialMatchingAreas.size()) {
                             Area1.matchNum  = 1;
@@ -1143,6 +1175,7 @@ class FuzzyMatching : baseOps {
                         Area1.right = ManhattenInLayout.right + layerInPattern.markManhatten.up - pattern.mark.up;
                         Area1.matchLayer[layerInPattern.layerNum] = true;
                         Area1.rotationMod = matchMod;
+                        Area1.index[layerInLayout.layerNum] = i;
 
                         if (potentialAreaMatch(Area1, result) >= result.potentialMatchingAreas.size()) {
                             Area1.matchNum  = 1;
@@ -1159,6 +1192,7 @@ class FuzzyMatching : baseOps {
 
                     default : break;
                 }
+                i++;
             }
         }
         return result;
@@ -1211,8 +1245,10 @@ class PreciseMatching : baseOps{
     void KdTreeAreaSearch (KdTree* tree, potentialMatchingArea area, int depth, vector<pointInTree> &result) {
         if (tree == nullptr) return ;
         if (tree->isLeaf()) {
-            if (checkCornerInPotentialArea (tree->root, area)) {
-                result.push_back(tree->root);
+            if (tree->root.x != -1 || tree->root.y != -1){
+                if (checkCornerInPotentialArea (tree->root, area)) {
+                    result.push_back(tree->root);
+                }
             }
             return;
         }
@@ -1270,13 +1306,45 @@ class PreciseMatching : baseOps{
         }
     }
 
-    void addManhattensToPotentialArea (layer layer, potentialMatchingArea& area) {
+    void areaSearchAvoidKdTree (layer layerInLayout, potentialMatchingArea area, vector<pointInTree> &result) {
+        map <int, vector<int>> pointMap;
+        for (auto corner : layerInLayout.pointsInTree) {
+            pointMap[corner.x].push_back(corner.y);
+        }
+
+        int i = 0;
+        for (auto pair : pointMap) {
+            if (pair.first < area.left) {
+                continue;
+                i += pair.second.size();
+            } else if (pair.first > area.right) {
+                break;
+            } else {
+                for (auto y : pair.second) {
+                    if (y <= area.up && y >= area.down) {
+                        result.push_back(layerInLayout.pointsInTree[i]);
+                    }
+                    i++;
+                }
+            }
+        }
+    }
+
+    void addManhattensToPotentialArea (layer layer, potentialMatchingArea& area, pointInTree point) {
 
         if (layer.Manhattens.size() == 0) {
             return ;
         }
 
+        // KdTree* tree = findPointInTree(&layer.tree1, point, layer.tree1.dimension);
+
+        // while (!tree->isRoot() && checkCornerInPotentialArea(tree->root, area)) {
+        //     tree = tree->parent;
+        // }
+
+        // KdTreeAreaSearch(tree, area, tree->dimension, area.layerMatchInfo[layer.layerNum].corners);
         KdTreeAreaSearch(&layer.tree1, area, layer.tree1.dimension, area.layerMatchInfo[layer.layerNum].corners);
+        // areaSearchAvoidKdTree(layer, area, area.layerMatchInfo[layer.layerNum].corners);
 
         for (auto points : area.layerMatchInfo[layer.layerNum].corners) {
             area.layerMatchInfo[layer.layerNum].ManhattenInArea[points.index] ++;
@@ -1302,7 +1370,11 @@ class PreciseMatching : baseOps{
             return -1;
         }
 
-        addManhattensToPotentialArea(layerInLayout, area);
+        pointInTree point;
+        point.x = layerInLayout.Manhattens[area.index[layerInLayout.layerNum]].left;
+        point.y = layerInLayout.Manhattens[area.index[layerInLayout.layerNum]].up;
+
+        addManhattensToPotentialArea(layerInLayout, area, point);
 
         if (area.layerMatchInfo[layerInLayout.layerNum].ManhattenInArea.size() != layerInPattern.Manhattens.size()) {
             area.matchLayer[layerInLayout.layerNum] = false;
@@ -1317,9 +1389,11 @@ class PreciseMatching : baseOps{
             auto area = areas.potentialMatchingAreas[i];
             for (auto layerInLayout : layout.layers) {
                 areaCheckerByManhattenNum(layerInLayout, area, pattern);
-            }
-            if (area.matchNum <= 0) {
-                areas.potentialMatchingAreas.erase(areas.potentialMatchingAreas.begin() + i);
+                if (area.matchNum <= 0) {
+                    areas.potentialMatchingAreas.erase(areas.potentialMatchingAreas.begin() + i);
+                    i--;
+                    break;
+                }
             }
         }
         return 0;
@@ -1819,7 +1893,7 @@ class PreciseMatching : baseOps{
     }
 };
 
-class test {
+class test : baseOps {
     public:
     int outEdges (Manhatten ManHT) {
         if (ManHT.edges.empty()) {
@@ -2130,34 +2204,73 @@ class test {
         return 0;
     }
 
-    int testAddManhattenToPotentialArea () {
+    // int testAddManhattenToPotentialArea () {
+    //     Read r;
+    //     PreciseMatching PM;
+    //     FuzzyMatching FM;
+    //     baseOps BO;
+
+    //     auto patternMap = r.readPattern("./testset/small/small_pattern.txt");
+    //     auto layout = r.readLayout("./testset/large/large_layout.txt");
+    //     auto layer = patternMap.patterns[0].layers[0];
+    //     layer = layout.layers[0];
+    //     potentialMatchingArea area;
+    //     area.down = 0;
+    //     area.left = 1000;
+    //     area.up = 13800;
+    //     area.right = 10200;
+
+    //     PM.addManhattensToPotentialArea(layer, area, );
+
+    //     for (auto point : area.layerMatchInfo[1].corners) {
+    //         cout << "(" << point.x << "," << point.y << ") , " ;
+    //     }
+
+    //     cout << endl;
+
+    //     for (auto pair : area.layerMatchInfo[1].ManhattenInArea) {
+    //         cout << "Manhatten " << pair.first << " have " << pair.second << "corners in area" << endl;
+    //     }
+
+    //     return 0;
+    // }
+
+    int outpotentialareas () {
         Read r;
-        PreciseMatching PM;
         FuzzyMatching FM;
+        PreciseMatching PM;
+        clock_t start_t, finish_t;
         baseOps BO;
-
-        auto patternMap = r.readPattern("./testset/small/small_pattern.txt");
+        start_t = clock();
+        auto pattern = r.readPattern("./testset/large/large_pattern.txt");
+        finish_t = clock();
+        cout << "Reading large pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+        start_t = clock();
         auto layout = r.readLayout("./testset/large/large_layout.txt");
-        auto layer = patternMap.patterns[0].layers[0];
-        layer = layout.layers[0];
-        potentialMatchingArea area;
-        area.down = 0;
-        area.left = 1000;
-        area.up = 13800;
-        area.right = 10200;
-
-        PM.addManhattensToPotentialArea(layer, area);
-
-        for (auto point : area.layerMatchInfo[1].corners) {
-            cout << "(" << point.x << "," << point.y << ") , " ;
+        finish_t = clock();
+        cout << "Reading large layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+        cout << "Unmirrored:" << endl;
+        for (int i = 0; i < pattern.patterns.size(); i++) {
+            start_t = clock();
+            auto potentialArea = FM.findPotentialArea(layout, pattern.patterns[i]);
+            cout << "Num" << i+1 << " pattern have " << potentialArea.potentialMatchingAreas.size() << " potential areas" << endl;
+            finish_t = clock();
+            cout << "Finding potential areas in Num" << i+1 << " pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+            map<int, int> Mnum;
+            for (auto area : potentialArea.potentialMatchingAreas) {
+                Mnum[area.matchLayer.size()] ++;
+            }
+            for (auto pair : Mnum) {
+                cout << "There are " << pair.second << " areas whose match num is " << pair.first << endl;
+            }
+            for (auto area : potentialArea.potentialMatchingAreas) {
+                cout << "up: " << area.up << "\tdown: " << area.down << "\tleft: " << area.left << "\tright: " << area.right << endl;
+                cout << "\tmatching num is " << area.matchNum << "\trotation mod is " << area.rotationMod << endl ;
+                for (auto pair : area.matchLayer) {
+                    cout << "\t\t" << "layer" << pair.first << " : is " << pair.second << endl; 
+                }
+            }
         }
-
-        cout << endl;
-
-        for (auto pair : area.layerMatchInfo[1].ManhattenInArea) {
-            cout << "Manhatten " << pair.first << " have " << pair.second << "corners in area" << endl;
-        }
-
         return 0;
     }
 };
@@ -2178,6 +2291,7 @@ int main () {
     // t.testKdTree();
     // t.testFindPointInTree();
     // t.testAddManhattenToPotentialArea();
+    // t.outpotentialareas();
     finish_t = clock();
     cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
     return 0;
