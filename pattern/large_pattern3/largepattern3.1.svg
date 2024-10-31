@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="8415" height="15015" viewBox="-682.5 -14332.5 8415 15015">
+<defs>
+<style type="text/css">
+.l0d0 {stroke: #F38400; fill: #F38400; fill-opacity: 0.5;}
+</style>
+</defs>
+<rect x="-682.5" y="-14332.5" width="8415" height="15015" fill="#222222" stroke="none"/>
+<g id="FIRST" transform="scale(1 -1)">
+<polygon id="00000138EDB049B0" class="l0d0" points="0,5680 2250,5680 2250,7730 0,7730"/>
+<polygon id="00000138EDB04B70" class="l0d0" points="0,11630 2250,11630 2250,12530 0,12530"/>
+<polygon id="00000138EDB04A20" class="l0d0" points="450,2480 3050,2480 3050,3830 450,3830"/>
+<polygon id="00000138EDB04A90" class="l0d0" points="3030,0 3930,0 3930,450 3030,450"/>
+<polygon id="00000138EDB04BE0" class="l0d0" points="3030,13200 3930,13200 3930,13650 3030,13650"/>
+<polygon id="00000138EF284800" class="l0d0" points="4000,2480 6600,2480 6600,3830 4000,3830"/>
+<polygon id="00000138EF284790" class="l0d0" points="4800,5680 7050,5680 7050,7730 4800,7730"/>
+<polygon id="00000138EF284410" class="l0d0" points="4800,11630 7050,11630 7050,12530 4800,12530"/>
+<polygon id="00000138EF284640" class="l0d0" points="0,0 7050,0 7050,13650 0,13650"/>
+</g>
+</svg>

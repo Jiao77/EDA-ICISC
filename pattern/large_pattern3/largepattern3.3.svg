@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="8415" height="15015" viewBox="-682.5 -14332.5 8415 15015">
+<defs>
+<style type="text/css">
+.l0d0 {stroke: #F38400; fill: #F38400; fill-opacity: 0.5;}
+</style>
+</defs>
+<rect x="-682.5" y="-14332.5" width="8415" height="15015" fill="#222222" stroke="none"/>
+<g id="FIRST" transform="scale(1 -1)">
+<polygon id="00000138EFEC79F0" class="l0d0" points="0,7030 330,7030 330,7680 0,7680"/>
+<polygon id="00000138EFEC7D00" class="l0d0" points="0,11680 330,11680 330,12330 0,12330"/>
+<polygon id="00000138EFEC7F30" class="l0d0" points="500,3130 1150,3130 1150,3780 500,3780"/>
+<polygon id="00000138EFEC7C20" class="l0d0" points="1550,7030 2200,7030 2200,7680 1550,7680"/>
+<polygon id="00000138EFEC7D70" class="l0d0" points="1550,11680 2200,11680 2200,12330 1550,12330"/>
+<polygon id="00000138EFEC7C90" class="l0d0" points="2080,10180 2730,10180 2730,10830 2080,10830"/>
+<polygon id="00000138EFEC7FA0" class="l0d0" points="2350,3130 3000,3130 3000,3780 2350,3780"/>
+<polygon id="00000138EFEC7B40" class="l0d0" points="3030,1280 3680,1280 3680,1930 3030,1930"/>
+<polygon id="00000138EFEC7EC0" class="l0d0" points="3150,0 3800,0 3800,330 3150,330"/>
+<polygon id="00000138EFEC7AD0" class="l0d0" points="3150,13320 3800,13320 3800,13650 3150,13650"/>
+<polygon id="00000138EDB04780" class="l0d0" points="4050,3130 4700,3130 4700,3780 4050,3780"/>
+<polygon id="00000138EDB04630" class="l0d0" points="4330,8680 4980,8680 4980,9330 4330,9330"/>
+<polygon id="00000138EDB04C50" class="l0d0" points="4850,7030 5500,7030 5500,7680 4850,7680"/>
+<polygon id="00000138EDB04CC0" class="l0d0" points="4850,11680 5500,11680 5500,12330 4850,12330"/>
+<polygon id="00000138EDB04B00" class="l0d0" points="5900,3130 6550,3130 6550,3780 5900,3780"/>
+<polygon id="00000138EDB04710" class="l0d0" points="6720,7030 7050,7030 7050,7680 6720,7680"/>
+<polygon id="00000138EDB046A0" class="l0d0" points="6720,11680 7050,11680 7050,12330 6720,12330"/>
+<polygon id="00000138EDB04D30" class="l0d0" points="0,0 7050,0 7050,13650 0,13650"/>
+</g>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="115800" height="151800" viewBox="-6900 -144900 115800 151800">
+<defs>
+<style type="text/css">
+.l0d0 {stroke: #F38400; fill: #F38400; fill-opacity: 0.5;}
+</style>
+</defs>
+<rect x="-6900" y="-144900" width="115800" height="151800" fill="#222222" stroke="none"/>
+<g id="FIRST" transform="scale(1 -1)">
+<polygon id="00000138EDAA1460" class="l0d0" points="0,90000 3000,90000 3000,96000 0,96000"/>
+<polygon id="00000138EDAA1AF0" class="l0d0" points="21000,0 27000,0 27000,3000 21000,3000"/>
+<polygon id="00000138EDAA1C40" class="l0d0" points="63000,0 69000,0 69000,3000 63000,3000"/>
+<polygon id="00000138EDAA1A10" class="l0d0" points="99000,90000 102000,90000 102000,96000 99000,96000"/>
+<polygon id="00000138EDAA0B30" class="l0d0" points="0,0 102000,0 102000,138000 0,138000"/>
+</g>
+</svg>

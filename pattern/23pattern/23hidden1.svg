@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="13970" height="11000" viewBox="-635 -10365 13970 11000">
+<defs>
+<style type="text/css">
+.l0d0 {stroke: #F38400; fill: #F38400; fill-opacity: 0.5;}
+</style>
+</defs>
+<rect x="-635" y="-10365" width="13970" height="11000" fill="#222222" stroke="none"/>
+<g id="FIRST" transform="scale(1 -1)">
+<polygon id="00000138EF20B790" class="l0d0" points="100,7690 3260,7690 3260,9350 100,9350"/>
+<polygon id="00000138EF20BF70" class="l0d0" points="1600,190 3260,190 3260,6350 1600,6350"/>
+<polygon id="00000138EF20B090" class="l0d0" points="4350,1690 12510,1690 12510,3350 4350,3350"/>
+<polygon id="00000138EF20B100" class="l0d0" points="4350,4690 12510,4690 12510,6350 4350,6350"/>
+<polygon id="00000138EF20BF00" class="l0d0" points="6100,7690 9260,7690 9260,9350 6100,9350"/>
+<polygon id="00000138EF20B2C0" class="l0d0" points="0,0 12700,0 12700,9730 0,9730"/>
+</g>
+</svg>
