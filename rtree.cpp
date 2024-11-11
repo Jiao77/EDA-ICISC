@@ -1180,9 +1180,7 @@ class test : baseOps {
         for (auto Point : ManHT.points) {
             cout << "(" << Point.x << "," << Point.y << "),";
         }
-
         cout << endl;
-
         cout << "Manhatten's number of inconer points: " << ManHT.incornerCount << endl;
         cout << "Manhatten's number of outcorner points: " << ManHT.outcornerCount << endl;
         for (auto pair : ManHT.mEdgeLength) {
@@ -1205,16 +1203,19 @@ class test : baseOps {
         finish_t = clock();
         cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
         cout << "Unmirrored:" << endl;
-        //for (int i = 0; i < pattern.patterns.size(); i++) {
-        for (int i = 1; i < 2; i++) {
+        //分pattern
+        for (int i = 0; i < pattern.patterns.size(); i++) {
+        //for (int i = 0; i < 2; i++) {
             start_t = clock();
             auto potentialArea = FM.findPotentialArea(layout, pattern.patterns[i]);
             cout << "Num" << i+1 << " pattern have " << potentialArea.potentialMatchingAreas.size() << " potential areas" << endl;
             finish_t = clock();
             cout << "Finding potential areas in Num" << i+1 << " pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
             int boolcount=0;
+            Pattern CP = pattern.patterns[i];
             ///* 潜在匹配区域储存!!!
                 for (int j = 0; j < potentialArea.potentialMatchingAreas.size(); j++) {
+                    //分区域
                     int x1=potentialArea.potentialMatchingAreas[j].left;
                     int y1=potentialArea.potentialMatchingAreas[j].down;
                     int x2=potentialArea.potentialMatchingAreas[j].right;
@@ -1230,29 +1231,61 @@ class test : baseOps {
                         
 	                    //std::cout << "spatial query result:" << std::endl;
                         //using boost::geometry::dsv;
-                        boost::geometry::model::multi_polygon<BPolygon> booland;
-                        boost::geometry::model::multi_polygon<BPolygon> booxor;
+                        //std::vector<boost::geometry::model::multi_polygon<BPolygon>> CL;
+                        boost::geometry::model::multi_polygon<BPolygon> CL;
+                        //bg::model::multi_polygon<boost::geometry::model::multi_polygon<BPolygon>> CL;
                         int nresult=result_s.size();
 	                    for (int l=0; l<nresult; l++){                  
                             BPolygon poly;
-                            for (int j=0;j<layout.layers[k].Manhattens[result_s[l].second].points.size();j++){
-                                bg::append(poly.outer(), BPoint(layout.layers[k].Manhattens[result_s[l].second].points[j].x, layout.layers[k].Manhattens[result_s[l].second].points[j].y));
+                            std::vector<BPolygon> booland;
+                            //BPolygon booland;
+                            for (int jj=0;jj<layout.layers[k].Manhattens[result_s[l].second].points.size();jj++){
+                                bg::append(poly.outer(), BPoint(layout.layers[k].Manhattens[result_s[l].second].points[jj].x, layout.layers[k].Manhattens[result_s[l].second].points[jj].y));
                                 //cout << "point" << Manhattens[i].points[j].x<< "," << Manhattens[i].points[j].y << endl;
-                                boost::geometry::intersection(poly, query_box, booland);
                                 //std::cout << boost::geometry::dsv(booland) << std::endl;
                             }
+                            boost::geometry::intersection(poly, query_box, booland);
+                            BOOST_FOREACH(BPolygon const& boolp, booland)
+                            {
+                                CL.push_back(boolp);
+                            }
+                            
                         }
-		                boolcount=boolcount+1;    
-                        cout << "bool caculate" << boolcount << "times" << endl;
+                        //int currentlayerpatternsize = CP.layers[k].Manhattens.size();
+                        boost::geometry::model::multi_polygon<BPolygon> CCP;
+                        
+                        //*
+	                    for (int m=0; m<CP.layers[k].Manhattens.size(); m++){                  
+                            BPolygon patternpoly;
+                            
+                            for (int jj=0;jj<CP.layers[k].Manhattens[m].points.size();jj++){
+                                bg::append(patternpoly.outer(), BPoint(CP.layers[k].Manhattens[m].points[jj].x+x1, CP.layers[k].Manhattens[m].points[jj].y+y1));
+                                //cout << "point" << Manhattens[i].points[j].x<< "," << Manhattens[i].points[j].y << endl;
+                                //std::cout << boost::geometry::dsv(booland) << std::endl;
+                            }
+                            CCP.push_back(patternpoly);
+                        }
+                        
+                        boost::geometry::model::multi_polygon<BPolygon> booxor;
+                        boost::geometry::sym_difference(CCP, CL, booxor);
+                        //*/
+
+                        //std::cout
+                        //    << "layer " << k << " XOR:" << std::endl
+                        //    << boost::geometry::dsv(booxor) << std::endl;
+                        boolcount=boolcount+1;    
+                        //cout << "bool caculate" << boolcount << "times" << endl;
+                        //std::cout << boost::geometry::dsv(booland) << std::endl;
                     }
-                    }
+                }
+                //cout << "bool caculate" << boolcount << "times" << endl;
             //*/
             map<int, int> Mnum;
             for (auto area : potentialArea.potentialMatchingAreas) {
                 Mnum[area.matchLayer.size()] ++;
             }
             for (auto pair : Mnum) {
-                cout << "bool caculate" << boolcount << "times, There are " << pair.second << " areas whose match num is " << pair.first << endl;
+                cout << "bool caculate " << boolcount << " times, There are " << pair.second << " areas whose match num is " << pair.first << endl;
             }
         }
         return 0;
