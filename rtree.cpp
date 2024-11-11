@@ -17,6 +17,8 @@
 #include <boost/assign.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/foreach.hpp>
+#include <thread>
+
 
 using namespace std;
 namespace bg = boost::geometry;
@@ -1188,24 +1190,10 @@ class test : baseOps {
         }
         return 0;
     }
-    int testFindPotentialArea () {
-        Read r;
-        FuzzyMatching FM;
-        //PreciseMatching PM;
-        clock_t start_t, finish_t;
-        baseOps BO;
-        start_t = clock();
-        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
-        finish_t = clock();
-        cout << "Reading small pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
-        start_t = clock();
-        auto layout = r.readLayout("./testset/small/small_layout.txt");
-        finish_t = clock();
-        cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
-        cout << "Unmirrored:" << endl;
-        //分pattern
-        for (int i = 0; i < pattern.patterns.size(); i++) {
+
+int testfunc (int i, patternMap pattern, FuzzyMatching FM, layout layout) {
         //for (int i = 0; i < 2; i++) {
+        clock_t start_t, finish_t;
             start_t = clock();
             auto potentialArea = FM.findPotentialArea(layout, pattern.patterns[i]);
             cout << "Num" << i+1 << " pattern have " << potentialArea.potentialMatchingAreas.size() << " potential areas" << endl;
@@ -1287,19 +1275,62 @@ class test : baseOps {
             for (auto pair : Mnum) {
                 cout << "bool caculate " << boolcount << " times, There are " << pair.second << " areas whose match num is " << pair.first << endl;
             }
+            return 0;
+        }
+
+    /*
+    int testFindPotentialArea () {
+        Read r;
+        FuzzyMatching FM;
+        //PreciseMatching PM;
+        clock_t start_t, finish_t;
+        baseOps BO;
+        start_t = clock();
+        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
+        finish_t = clock();
+        cout << "Reading small pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+        start_t = clock();
+        auto layout = r.readLayout("./testset/small/small_layout.txt");
+        finish_t = clock();
+        cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+        cout << "Unmirrored:" << endl;
+        //分pattern
+        for (int i = 0; i < pattern.patterns.size(); i++) {
+        //for (int i = 0; i < 2; i++) {
+            testfunc(i, pattern, FM, layout);
         }
         return 0;
     }
+    */
 
 };
 
 int main () {
-    clock_t start_t, finish_t;
-    start_t = clock();
+    clock_t mstart_t, mfinish_t;
+    mstart_t = clock();
     test t;
     //t.testReadLayout();
-    t.testFindPotentialArea();
+    //t.testFindPotentialArea();
+    Read r;
+    FuzzyMatching FM;
+        //PreciseMatching PM;
+    clock_t start_t, finish_t;
+    baseOps BO;
+    start_t = clock();
+    auto pattern = r.readPattern("./testset/small/small_pattern.txt");
     finish_t = clock();
-    cout << "Time: " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << endl;
+    cout << "Reading small pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+    start_t = clock();
+    auto layout = r.readLayout("./testset/small/small_layout.txt");
+    finish_t = clock();
+    cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+    cout << "Unmirrored:" << endl;
+    //分pattern
+    for (int i = 0; i < pattern.patterns.size(); i++) {
+    //for (int i = 0; i < 2; i++) {
+        t.testfunc(i, pattern, FM, layout);
+    }
+    mfinish_t = clock();
+    cout << "Time: " << (double)(mfinish_t - mstart_t) / CLOCKS_PER_SEC << endl;
     return 0;
 }
