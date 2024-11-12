@@ -2,8 +2,8 @@
 //在这个代码中，我们首先定义了一个  rotatePoint  函数，它接受一个点、旋转中心和旋转度数，然后根据旋转度数计算出旋转后的点的坐标。接着，我们定义了一个  rotateManhatten  函数，
 //它接受一个  Manhatten  图形、旋转中心和旋转度数，然后对  Manhatten  中的每个点进行旋转，并将旋转后的点存储在一个新的  Manhatten  图形中。最后，在  Createrelatedpattern  函
 //数中，我们创建了一个  rotatedPattern  数组来存储旋转后的  pattern  。我们首先计算出旋转中心，然后对  original  中的每个  Manhatten  图形进行旋转，并将结果存储
-//在  rotatedPattern  中。最后，我们返回  rotatedPattern  数组的指针，即逆时针旋转90°的结果。其他两个旋转结果可以通过数组索引访问。
-**//
+//在  rotatedPattern  中。最后，我们返回  rotatedPattern  数组的指针，旋转结果可以通过数组索引访问。
+// **//
 #include<iostream>
 #include<vector>
 using namespace std;
@@ -61,23 +61,23 @@ Manhatten rotateManhatten(const Manhatten& manhatten, const point& center, int d
 
 // 旋转pattern
 pattern* Createrelatedpattern(const pattern& original) {
-    pattern rotatedPattern[3];
+    pattern* rotatedPattern=new pattern[3];
     point center = { (original.marker.points[0].x + original.marker.points[1].x) / 2,
                     (original.marker.points[0].y + original.marker.points[1].y) / 2 };
 
     for (int i = 0; i < 3; ++i) {
         rotatedPattern[i].marker.points[0] = rotatePoint(original.marker.points[0], center, 90 * (i + 1));
         rotatedPattern[i].marker.points[1] = rotatePoint(original.marker.points[1], center, 90 * (i + 1));
-        for (const auto& layer : original.layers) {
+        for (const auto& layers : original.layers) {
             layer rotatedLayer;
-            for (const auto& manhatten : layer.Manhattens) {
+            for (const auto& manhatten : layers.Manhattens) {
                 rotatedLayer.Manhattens.push_back(rotateManhatten(manhatten, center, 90 * (i + 1)));
             }
             rotatedPattern[i].layers.push_back(rotatedLayer);
         }
     }
 
-    return rotatedPattern; // 返回第一个旋转结果，其他两个可以通过索引访问
+    return rotatedPattern; // 返回旋转结果指针，旋转图形可以通过索引访问
 }
 
 int main() 
