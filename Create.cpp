@@ -1,0 +1,86 @@
+//**代码原理：
+//在这个代码中，我们首先定义了一个  rotatePoint  函数，它接受一个点、旋转中心和旋转度数，然后根据旋转度数计算出旋转后的点的坐标。接着，我们定义了一个  rotateManhatten  函数，
+//它接受一个  Manhatten  图形、旋转中心和旋转度数，然后对  Manhatten  中的每个点进行旋转，并将旋转后的点存储在一个新的  Manhatten  图形中。最后，在  Createrelatedpattern  函
+//数中，我们创建了一个  rotatedPattern  数组来存储旋转后的  pattern  。我们首先计算出旋转中心，然后对  original  中的每个  Manhatten  图形进行旋转，并将结果存储
+//在  rotatedPattern  中。最后，我们返回  rotatedPattern  数组的指针，即逆时针旋转90°的结果。其他两个旋转结果可以通过数组索引访问。
+// **//
+#include<iostream>
+#include<vector>
+using namespace std;
+
+struct point {
+    int x;
+    int y;
+};
+
+struct Manhatten { // 曼哈顿图形
+    vector<point> points;
+};
+
+struct marker { // 表示一个图形边框的左上角和右下角
+    point points[2];
+};
+
+struct layer { // 表示一层里面多个曼哈顿图形的集合，也可以说时一个范围内的一层
+    vector<Manhatten> Manhattens;
+};
+
+struct pattern { // 表示一个图形边框以及多层曼哈顿图形的集合，也可以说是一个pattern的必要组成元素
+    marker marker;
+    vector<layer> layers;
+};
+
+// 旋转一个点90度
+point rotatePoint(const point& p, const point& center, int degree) {
+    point rotated;
+    switch (degree) {
+    case 90:
+        rotated.x = center.x - p.y + center.y;
+        rotated.y = p.x - center.x + center.y;
+        break;
+    case 180:
+        rotated.x = 2 * center.x - p.x;
+        rotated.y = 2 * center.y - p.y;
+        break;
+    case 270:
+        rotated.x = p.y - center.y + center.x;
+        rotated.y = center.y - p.x + center.x;
+        break;
+    }
+    return rotated;
+}
+
+// 旋转Manhatten图形
+Manhatten rotateManhatten(const Manhatten& manhatten, const point& center, int degree) {
+    Manhatten rotatedManhatten;
+    for (const auto& p : manhatten.points) {
+        rotatedManhatten.points.push_back(rotatePoint(p, center, degree));
+    }
+    return rotatedManhatten;
+}
+
+// 旋转pattern
+pattern* Createrelatedpattern(const pattern& original) {
+    pattern rotatedPattern[3];
+    point center = { (original.marker.points[0].x + original.marker.points[1].x) / 2,
+                    (original.marker.points[0].y + original.marker.points[1].y) / 2 };
+
+    for (int i = 0; i < 3; ++i) {
+        rotatedPattern[i].marker.points[0] = rotatePoint(original.marker.points[0], center, 90 * (i + 1));
+        rotatedPattern[i].marker.points[1] = rotatePoint(original.marker.points[1], center, 90 * (i + 1));
+        for (const auto& layer : original.layers) {
+            layer rotatedLayer;
+            for (const auto& manhatten : layer.Manhattens) {
+                rotatedLayer.Manhattens.push_back(rotateManhatten(manhatten, center, 90 * (i + 1)));
+            }
+            rotatedPattern[i].layers.push_back(rotatedLayer);
+        }
+    }
+
+    return rotatedPattern; // 返回第一个旋转结果，其他两个可以通过索引访问
+}
+
+int main() 
+{
+   
+}
