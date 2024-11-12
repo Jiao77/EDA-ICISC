@@ -1,8 +1,8 @@
-//**´úÂëÔ­Àí£º
-//ÔÚÕâ¸ö´úÂëÖĞ£¬ÎÒÃÇÊ×ÏÈ¶¨ÒåÁËÒ»¸ö  rotatePoint  º¯Êı£¬Ëü½ÓÊÜÒ»¸öµã¡¢Ğı×ªÖĞĞÄºÍĞı×ª¶ÈÊı£¬È»ºó¸ù¾İĞı×ª¶ÈÊı¼ÆËã³öĞı×ªºóµÄµãµÄ×ø±ê¡£½Ó×Å£¬ÎÒÃÇ¶¨ÒåÁËÒ»¸ö  rotateManhatten  º¯Êı£¬
-//Ëü½ÓÊÜÒ»¸ö  Manhatten  Í¼ĞÎ¡¢Ğı×ªÖĞĞÄºÍĞı×ª¶ÈÊı£¬È»ºó¶Ô  Manhatten  ÖĞµÄÃ¿¸öµã½øĞĞĞı×ª£¬²¢½«Ğı×ªºóµÄµã´æ´¢ÔÚÒ»¸öĞÂµÄ  Manhatten  Í¼ĞÎÖĞ¡£×îºó£¬ÔÚ  Createrelatedpattern  º¯
-//ÊıÖĞ£¬ÎÒÃÇ´´½¨ÁËÒ»¸ö  rotatedPattern  Êı×éÀ´´æ´¢Ğı×ªºóµÄ  pattern  ¡£ÎÒÃÇÊ×ÏÈ¼ÆËã³öĞı×ªÖĞĞÄ£¬È»ºó¶Ô  original  ÖĞµÄÃ¿¸ö  Manhatten  Í¼ĞÎ½øĞĞĞı×ª£¬²¢½«½á¹û´æ´¢
-//ÔÚ  rotatedPattern  ÖĞ¡£×îºó£¬ÎÒÃÇ·µ»Ø  rotatedPattern  Êı×éµÄÖ¸Õë£¬¼´ÄæÊ±ÕëĞı×ª90¡ãµÄ½á¹û¡£ÆäËûÁ½¸öĞı×ª½á¹û¿ÉÒÔÍ¨¹ıÊı×éË÷Òı·ÃÎÊ¡£
+//**ä»£ç åŸç†ï¼š
+//åœ¨è¿™ä¸ªä»£ç ä¸­ï¼Œæˆ‘ä»¬é¦–å…ˆå®šä¹‰äº†ä¸€ä¸ª  rotatePoint  å‡½æ•°ï¼Œå®ƒæ¥å—ä¸€ä¸ªç‚¹ã€æ—‹è½¬ä¸­å¿ƒå’Œæ—‹è½¬åº¦æ•°ï¼Œç„¶åæ ¹æ®æ—‹è½¬åº¦æ•°è®¡ç®—å‡ºæ—‹è½¬åçš„ç‚¹çš„åæ ‡ã€‚æ¥ç€ï¼Œæˆ‘ä»¬å®šä¹‰äº†ä¸€ä¸ª  rotateManhatten  å‡½æ•°ï¼Œ
+//å®ƒæ¥å—ä¸€ä¸ª  Manhatten  å›¾å½¢ã€æ—‹è½¬ä¸­å¿ƒå’Œæ—‹è½¬åº¦æ•°ï¼Œç„¶åå¯¹  Manhatten  ä¸­çš„æ¯ä¸ªç‚¹è¿›è¡Œæ—‹è½¬ï¼Œå¹¶å°†æ—‹è½¬åçš„ç‚¹å­˜å‚¨åœ¨ä¸€ä¸ªæ–°çš„  Manhatten  å›¾å½¢ä¸­ã€‚æœ€åï¼Œåœ¨  Createrelatedpattern  å‡½
+//æ•°ä¸­ï¼Œæˆ‘ä»¬åˆ›å»ºäº†ä¸€ä¸ª  rotatedPattern  æ•°ç»„æ¥å­˜å‚¨æ—‹è½¬åçš„  pattern  ã€‚æˆ‘ä»¬é¦–å…ˆè®¡ç®—å‡ºæ—‹è½¬ä¸­å¿ƒï¼Œç„¶åå¯¹  original  ä¸­çš„æ¯ä¸ª  Manhatten  å›¾å½¢è¿›è¡Œæ—‹è½¬ï¼Œå¹¶å°†ç»“æœå­˜å‚¨
+//åœ¨  rotatedPattern  ä¸­ã€‚æœ€åï¼Œæˆ‘ä»¬è¿”å›  rotatedPattern  æ•°ç»„çš„æŒ‡é’ˆï¼Œæ—‹è½¬ç»“æœå¯ä»¥é€šè¿‡æ•°ç»„ç´¢å¼•è®¿é—®ã€‚
 // **//
 #include<iostream>
 #include<vector>
@@ -13,24 +13,24 @@ struct point {
     int y;
 };
 
-struct Manhatten { // Âü¹ş¶ÙÍ¼ĞÎ
+struct Manhatten { // æ›¼å“ˆé¡¿å›¾å½¢
     vector<point> points;
 };
 
-struct marker { // ±íÊ¾Ò»¸öÍ¼ĞÎ±ß¿òµÄ×óÉÏ½ÇºÍÓÒÏÂ½Ç
+struct marker { // è¡¨ç¤ºä¸€ä¸ªå›¾å½¢è¾¹æ¡†çš„å·¦ä¸Šè§’å’Œå³ä¸‹è§’
     point points[2];
 };
 
-struct layer { // ±íÊ¾Ò»²ãÀïÃæ¶à¸öÂü¹ş¶ÙÍ¼ĞÎµÄ¼¯ºÏ£¬Ò²¿ÉÒÔËµÊ±Ò»¸ö·¶Î§ÄÚµÄÒ»²ã
+struct layer { // è¡¨ç¤ºä¸€å±‚é‡Œé¢å¤šä¸ªæ›¼å“ˆé¡¿å›¾å½¢çš„é›†åˆï¼Œä¹Ÿå¯ä»¥è¯´æ—¶ä¸€ä¸ªèŒƒå›´å†…çš„ä¸€å±‚
     vector<Manhatten> Manhattens;
 };
 
-struct pattern { // ±íÊ¾Ò»¸öÍ¼ĞÎ±ß¿òÒÔ¼°¶à²ãÂü¹ş¶ÙÍ¼ĞÎµÄ¼¯ºÏ£¬Ò²¿ÉÒÔËµÊÇÒ»¸öpatternµÄ±ØÒª×é³ÉÔªËØ
+struct pattern { // è¡¨ç¤ºä¸€ä¸ªå›¾å½¢è¾¹æ¡†ä»¥åŠå¤šå±‚æ›¼å“ˆé¡¿å›¾å½¢çš„é›†åˆï¼Œä¹Ÿå¯ä»¥è¯´æ˜¯ä¸€ä¸ªpatternçš„å¿…è¦ç»„æˆå…ƒç´ 
     marker marker;
     vector<layer> layers;
 };
 
-// Ğı×ªÒ»¸öµã90¶È
+// æ—‹è½¬ä¸€ä¸ªç‚¹90åº¦
 point rotatePoint(const point& p, const point& center, int degree) {
     point rotated;
     switch (degree) {
@@ -50,7 +50,7 @@ point rotatePoint(const point& p, const point& center, int degree) {
     return rotated;
 }
 
-// Ğı×ªManhattenÍ¼ĞÎ
+// æ—‹è½¬Manhattenå›¾å½¢
 Manhatten rotateManhatten(const Manhatten& manhatten, const point& center, int degree) {
     Manhatten rotatedManhatten;
     for (const auto& p : manhatten.points) {
@@ -59,25 +59,25 @@ Manhatten rotateManhatten(const Manhatten& manhatten, const point& center, int d
     return rotatedManhatten;
 }
 
-// Ğı×ªpattern
+// æ—‹è½¬pattern
 pattern* Createrelatedpattern(const pattern& original) {
-    pattern rotatedPattern[3];
+    pattern* rotatedPattern=new pattern[3];
     point center = { (original.marker.points[0].x + original.marker.points[1].x) / 2,
                     (original.marker.points[0].y + original.marker.points[1].y) / 2 };
 
     for (int i = 0; i < 3; ++i) {
         rotatedPattern[i].marker.points[0] = rotatePoint(original.marker.points[0], center, 90 * (i + 1));
         rotatedPattern[i].marker.points[1] = rotatePoint(original.marker.points[1], center, 90 * (i + 1));
-        for (const auto& layer : original.layers) {
+        for (const auto& layers : original.layers) {
             layer rotatedLayer;
-            for (const auto& manhatten : layer.Manhattens) {
+            for (const auto& manhatten : layers.Manhattens) {
                 rotatedLayer.Manhattens.push_back(rotateManhatten(manhatten, center, 90 * (i + 1)));
             }
             rotatedPattern[i].layers.push_back(rotatedLayer);
         }
     }
 
-    return rotatedPattern; // ·µ»ØµÚÒ»¸öĞı×ª½á¹û£¬ÆäËûÁ½¸ö¿ÉÒÔÍ¨¹ıË÷Òı·ÃÎÊ
+    return rotatedPattern; // è¿”å›æ—‹è½¬ç»“æœæŒ‡é’ˆï¼Œæ—‹è½¬å›¾å½¢å¯ä»¥é€šè¿‡ç´¢å¼•è®¿é—®
 }
 
 int main() 
