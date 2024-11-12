@@ -1,5 +1,11 @@
 # EDA-ICISC
 第六届中国研究生创“芯”·EDA 精英挑战赛 赛题四：多层图形匹配与设计单元级版图验证算法
+
+- 目前完成的部分在buildrtree.cpp里，静态编译后的可执行文件是pm，可以按照下面的命令试一试能不能运行（txt文件要对应） 
+```
+./pm -layout ./testset/small/small_layout.txt -lib ./testset/small/small_pattern.txt
+```
+- 暂时还未实现xor的准确输出，所有关键曼哈顿图形的搜索，以及输出文件保存
 ## 可参考开源库：
 1. 曼哈顿图形异或操作库：[polyops](https://github.com/Rouslan/polyops?tab=readme-ov-file)
 
