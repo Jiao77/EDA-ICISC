@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_map>
+#include <getopt.h>
 #include <math.h>
 #include <vector>
 #include <string>
@@ -18,14 +19,15 @@
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/foreach.hpp>
 #include <thread>
+#include <boost/geometry/strategies/intersection.hpp>
 
 
 using namespace std;
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
-typedef bg::model::d2::point_xy<int, boost::geometry::cs::cartesian> BPoint; 
+typedef bg::model::d2::point_xy<double, boost::geometry::cs::cartesian> BPoint; 
 typedef bg::model::box<BPoint> BBox; 
-typedef boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<int>, 0, 0> BPolygon;
+typedef boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>, 0, 0> BPolygon;
 typedef std::pair<BBox, unsigned> BValue;
 typedef bgi::rtree<BValue, bgi::linear<16>> RTree;
 
@@ -1193,6 +1195,7 @@ class test : baseOps {
 
 int testfunc (int i, patternMap pattern, FuzzyMatching FM, layout layout) {
         //for (int i = 0; i < 2; i++) {
+        
         clock_t start_t, finish_t;
             start_t = clock();
             auto potentialArea = FM.findPotentialArea(layout, pattern.patterns[i]);
@@ -1200,47 +1203,70 @@ int testfunc (int i, patternMap pattern, FuzzyMatching FM, layout layout) {
             finish_t = clock();
             cout << "Finding potential areas in Num" << i+1 << " pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
             int boolcount=0;
-            Pattern CP = pattern.patterns[i];
+            Pattern CP = pattern.patterns[i];//curent pattern
             ///* 潜在匹配区域储存!!!
                 for (int j = 0; j < potentialArea.potentialMatchingAreas.size(); j++) {
-                    //分区域
+                    //潜在匹配区域边框
                     int x1=potentialArea.potentialMatchingAreas[j].left;
                     int y1=potentialArea.potentialMatchingAreas[j].down;
                     int x2=potentialArea.potentialMatchingAreas[j].right;
                     int y2=potentialArea.potentialMatchingAreas[j].up;
-                    //分layer
-                    //std::cout << "spatial query box:" << j+1 << " is (" << x1 << "," << y1 <<"),(" << x2 << "," << y2 << ")" << std::endl;
+                    //layer k
+                    
                     for (int k = 0; k< layout.layers.size(); k++){
-                        //cout << "intersect with polygons in layer" << k+1 << "：" << endl;
-                        BBox query_box(BPoint(x1, y1), BPoint(x2, y2));
-	                    std::vector<BValue> result_s;
-                        //std::cout << "rtree size:"<< layout.layers[k].rtree.size() <<  std::endl;
-	                    layout.layers[k].rtree.query(bgi::intersects(query_box), std::back_inserter(result_s));
                         
-	                    //std::cout << "spatial query result:" << std::endl;
-                        //using boost::geometry::dsv;
-                        //std::vector<boost::geometry::model::multi_polygon<BPolygon>> CL;
-                        boost::geometry::model::multi_polygon<BPolygon> CL;
-                        //bg::model::multi_polygon<boost::geometry::model::multi_polygon<BPolygon>> CL;
-                        int nresult=result_s.size();
+                        BBox query_box(BPoint(x1, y1), BPoint(x2, y2));//潜在匹配区域设为rtree中的query box
+	                    std::vector<BValue> result_s;
+                        BPolygon query_poly{{{x1, y1}, {x2, y1},{x2, y2}, {x1, y2}}};
+	                    layout.layers[k].rtree.query(bgi::intersects(query_box), std::back_inserter(result_s));//查找layout中与潜在匹配区域相交的曼哈顿图形
+                    
+                        boost::geometry::model::multi_polygon<BPolygon> CL;//current layer储存层内所有切割出的曼哈顿图形
+                       
+                        int nresult=result_s.size();//相交图形的个数
 	                    for (int l=0; l<nresult; l++){                  
-                            BPolygon poly;
-                            std::vector<BPolygon> booland;
-                            //BPolygon booland;
+                            BPolygon poly;//以boost中的格式储存
+                            boost::geometry::model::multi_polygon<BPolygon> booland;
+                            
                             for (int jj=0;jj<layout.layers[k].Manhattens[result_s[l].second].points.size();jj++){
                                 bg::append(poly.outer(), BPoint(layout.layers[k].Manhattens[result_s[l].second].points[jj].x, layout.layers[k].Manhattens[result_s[l].second].points[jj].y));
-                                //cout << "point" << Manhattens[i].points[j].x<< "," << Manhattens[i].points[j].y << endl;
-                                //std::cout << boost::geometry::dsv(booland) << std::endl;
+                                
                             }
-                            boost::geometry::intersection(poly, query_box, booland);
+                            
+                            booland.clear();
+                            boost::geometry::intersection(poly, query_poly, booland);//切割保留匹配区域内的部分
+                            //这里还要加一个条件判断是否自相切
+                            //*
+                            bool valid=boost::geometry::is_valid(booland);
+                            //std::cout << "is valid? " << valid << std::endl;
+                            if (valid==0){
+                                    //std::cout << "poly : " << boost::geometry::dsv(poly) << std::endl;
+                                    //std::cout << "query_box : " << boost::geometry::dsv(query_poly) << std::endl;
+                                    //std::cout << "before : " << boost::geometry::dsv(booland) << std::endl;
+                                    //boost::geometry::model::multi_polygon<BPolygon> unipoly;
+                                    boost::geometry::model::multi_polygon<BPolygon> outs;
+                                    boost::geometry::model::multi_polygon<BPolygon> tmp;
+                                    for (const BPolygon &p : booland) {
+                                            // add another polygon each iteration
+                                        boost::geometry::union_(outs, p, tmp);
+                                        outs = tmp;
+                                        boost::geometry::clear(tmp);
+                                    }
+                                    booland =outs;                                    
+                                    //std::cout << "after : " << boost::geometry::dsv(booland) << std::endl;
+                            }
+                            
                             BOOST_FOREACH(BPolygon const& boolp, booland)
                             {
                                 CL.push_back(boolp);
                             }
+
+                            
+                            //*/
+                           
                             
                         }
                         //int currentlayerpatternsize = CP.layers[k].Manhattens.size();
-                        boost::geometry::model::multi_polygon<BPolygon> CCP;
+                        boost::geometry::model::multi_polygon<BPolygon> CCP;//储存boost格式的当前pattern信息
                         
                         //*
 	                    for (int m=0; m<CP.layers[k].Manhattens.size(); m++){                  
@@ -1258,10 +1284,15 @@ int testfunc (int i, patternMap pattern, FuzzyMatching FM, layout layout) {
                         boost::geometry::sym_difference(CCP, CL, booxor);
                         //*/
 
-                        //std::cout
-                        //    << "layer " << k << " XOR:" << std::endl
-                        //    << boost::geometry::dsv(booxor) << std::endl;
+                        /*
+
+                        std::cout
+                            << "layer " << k << " XOR:" << std::endl
+                            << boost::geometry::dsv(booxor) << std::endl;
+
+                        */
                         boolcount=boolcount+1;    
+                        
                         //cout << "bool caculate" << boolcount << "times" << endl;
                         //std::cout << boost::geometry::dsv(booland) << std::endl;
                     }
@@ -1278,58 +1309,87 @@ int testfunc (int i, patternMap pattern, FuzzyMatching FM, layout layout) {
             return 0;
         }
 
-    /*
-    int testFindPotentialArea () {
-        Read r;
-        FuzzyMatching FM;
-        //PreciseMatching PM;
-        clock_t start_t, finish_t;
-        baseOps BO;
-        start_t = clock();
-        auto pattern = r.readPattern("./testset/small/small_pattern.txt");
-        finish_t = clock();
-        cout << "Reading small pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
-        start_t = clock();
-        auto layout = r.readLayout("./testset/small/small_layout.txt");
-        finish_t = clock();
-        cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
-        cout << "Unmirrored:" << endl;
-        //分pattern
-        for (int i = 0; i < pattern.patterns.size(); i++) {
-        //for (int i = 0; i < 2; i++) {
-            testfunc(i, pattern, FM, layout);
-        }
-        return 0;
-    }
-    */
-
 };
 
-int main () {
+int main (int argc, char* argv[]) {
+    std::string layout_file;
+    std::string lib_file;
+    struct option long_options[] = {
+        {"layout", required_argument, nullptr, 'l'},
+        {"lib", required_argument, nullptr, 'b'},
+        {nullptr, 0, nullptr, 0}  // 结尾必须有一个 null
+    };
+
+    int option_index = 0;
+    int c;
+
+    // 遍历命令行参数，并进行转换
+    for (int i = 1; i < argc; i++) {
+        // 如果参数以 '-' 开头，并且有字符 'l' 或者 'b' 或 'o' 则认为是长选项
+        if (argv[i][0] == '-' && argv[i][1] != '-') {
+            if (std::strncmp(argv[i], "-layout", 7) == 0) {
+                argv[i] = "-l";  // 完全替换为短选项
+            }
+            else if (std::strncmp(argv[i], "-lib", 4) == 0) {
+                argv[i] = "-b";  // 完全替换为短选项
+            }
+        }
+    }
+
+    // 解析参数
+    while ((c = getopt_long(argc, argv, "l:b:o:", long_options, &option_index)) != -1) {
+        switch (c) {
+            case 'l':
+                layout_file = optarg;
+                break;
+            case 'b':
+                lib_file = optarg;
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " -layout layout_file -lib lib_file -output output_file" << std::endl;
+                return 1;
+        }
+    }
+
+    // 检查是否所有必需的选项都已提供
+    if (layout_file.empty() || lib_file.empty() ) {
+        std::cerr << "Missing required arguments!" << std::endl;
+        return 1;
+    }
     clock_t mstart_t, mfinish_t;
     mstart_t = clock();
     test t;
-    //t.testReadLayout();
-    //t.testFindPotentialArea();
     Read r;
     FuzzyMatching FM;
-        //PreciseMatching PM;
     clock_t start_t, finish_t;
     baseOps BO;
     start_t = clock();
-    auto pattern = r.readPattern("./testset/small/small_pattern.txt");
+    auto pattern = r.readPattern(lib_file);
     finish_t = clock();
-    cout << "Reading small pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+    cout << "Reading pattern use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
     start_t = clock();
-    auto layout = r.readLayout("./testset/small/small_layout.txt");
+    auto layout = r.readLayout(layout_file);
     finish_t = clock();
-    cout << "Reading small layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
+    cout << "Reading layout use " << (double)(finish_t - start_t) / CLOCKS_PER_SEC << " s" << endl;
     cout << "Unmirrored:" << endl;
     //分pattern
+    //for (int i = 0; i < 1; i++) {
     for (int i = 0; i < pattern.patterns.size(); i++) {
     //for (int i = 0; i < 2; i++) {
         t.testfunc(i, pattern, FM, layout);
     }
+    //*
+    
+    auto mirrorMap = BO.mirrorPatternMap(pattern);
+        //镜像pattern
+        cout << "Mirrored:" << endl;
+    for (int i = 0; i < mirrorMap.patterns.size(); i++) {
+    //for (int i = 0; i < 2; i++) {
+        t.testfunc(i, mirrorMap, FM, layout);
+    }
+    //*/
+    
+
     mfinish_t = clock();
     cout << "Time: " << (double)(mfinish_t - mstart_t) / CLOCKS_PER_SEC << endl;
     return 0;
