@@ -1,7 +1,7 @@
 # EDA-ICISC
 第六届中国研究生创“芯”·EDA 精英挑战赛 赛题四：多层图形匹配与设计单元级版图验证算法
 
-- 目前完成的部分在buildrtree.cpp里，静态编译后的可执行文件是pm，可以按照下面的命令试一试能不能运行（txt文件要对应） 
+- 目前完成的部分在rtree.cpp里，静态编译后的可执行文件是pm，可以按照下面的命令试一试能不能运行（txt文件要对应） 
 ```
 ./pm -layout ./testset/small/small_layout.txt -lib ./testset/small/small_pattern.txt
 ```
